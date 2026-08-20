@@ -13,18 +13,28 @@ logger = logging.getLogger(__name__)
 _pool: ThreadedConnectionPool | None = None
 
 
-def init_pool() -> None:
+def init_pool(retries: int = 10, delay: float = 2.0) -> None:
     global _pool
-    _pool = ThreadedConnectionPool(
-        minconn=settings.db.min_connections,
-        maxconn=settings.db.max_connections,
-        dsn=settings.db.url,
-    )
-    logger.info(
-        "DB pool initialised (min=%d, max=%d)",
-        settings.db.min_connections,
-        settings.db.max_connections,
-    )
+    import time
+
+    for attempt in range(1, retries + 1):
+        try:
+            _pool = ThreadedConnectionPool(
+                minconn=settings.db.min_connections,
+                maxconn=settings.db.max_connections,
+                dsn=settings.db.url,
+            )
+            logger.info(
+                "DB pool initialised (min=%d, max=%d)",
+                settings.db.min_connections,
+                settings.db.max_connections,
+            )
+            return
+        except psycopg2.OperationalError as e:
+            logger.warning("DB not ready (attempt %d/%d): %s", attempt, retries, e)
+            if attempt == retries:
+                raise
+            time.sleep(delay)
 
 
 def close_pool() -> None:
