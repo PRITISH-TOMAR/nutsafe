@@ -1,14 +1,14 @@
 services:
-  collectore:
+  collector:
     build:
       context: ../collector
-      networks: 
+    networks: 
         - internal
-      ports:
-        - "4137:4137"
-        - "4138:4138"
+    ports:
+        - "4317:4317"
+        - "4318:4318"
     restart: unless-stopped
 
 networks:
   internal:
-    driber: bridge
+    driver: bridge
