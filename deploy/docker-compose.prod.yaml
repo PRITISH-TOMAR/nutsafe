@@ -2,13 +2,40 @@ services:
   collector:
     build:
       context: ../collector
-    networks: 
-        - internal
+    networks:
+      - internal
     ports:
-        - "4317:4317"
-        - "4318:4318"
+      - "4317:4317"
+      - "4318:4318"
+    restart: unless-stopped
+
+  intelligence:
+    build:
+      context: ../intelligence
+    networks:
+      - internal
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@storage:5432/${POSTGRES_DB}
+    depends_on:
+      - storage
+    restart: unless-stopped
+
+  storage:
+    image: postgres:16
+    networks:
+      - internal
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - ../storage/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
     restart: unless-stopped
 
 networks:
   internal:
     driver: bridge
+
+volumes:
+  pgdata:
