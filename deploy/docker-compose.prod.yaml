@@ -1,1 +1,14 @@
-# placeholder — wires edge, collector, intelligence, storage
+services:
+  collectore:
+    build:
+      context: ../collector
+      networks: 
+        - internal
+      ports:
+        - "4137:4137"
+        - "4138:4138"
+    restart: unless-stopped
+
+networks:
+  internal:
+    driber: bridge

@@ -1,4 +1,3 @@
-# placeholder — fill in during collector setup
 receivers:
   otlp:
     protocols:

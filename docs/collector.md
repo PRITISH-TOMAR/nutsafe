@@ -64,6 +64,30 @@ service:
 
 ---
 
+## collector/Dockerfile
+
+### Base image
+
+```dockerfile
+FROM otel/opentelemetry-collector-contrib:0.104.0
+```
+
+- `FROM` — every Dockerfile starts from a base image. This is the official OpenTelemetry Collector (contrib edition).
+- `contrib` vs `core` — the contrib image includes extra receivers/exporters/processors built by the community. We need contrib because later we'll use the `hostmetrics` receiver (CPU/mem/disk). Core wouldn't have it.
+- `0.104.0` — pin to a specific version. Never use `latest` in production; a silent upstream update can break your config.
+
+### Copy config
+
+```dockerfile
+COPY config/collector.yaml /etc/otelcol-contrib/config.yaml
+```
+
+- `COPY` — takes a file from your local machine (build context) and puts it inside the image.
+- `config/collector.yaml` — source, relative to the `collector/` directory (where the Dockerfile lives).
+- `/etc/otelcol-contrib/config.yaml` — destination inside the container. This is the exact path the collector binary looks for its config by default. You don't need to tell it where the file is — it checks this path automatically.
+
+---
+
 ## Phase progression
 
 | Phase | Exporter | Why |
