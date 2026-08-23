@@ -2,16 +2,24 @@ receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: 0.0.0.0:4137
-      http;
-        endpoint: 0.0.0.0:4138
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
 
 exporters:
-  debug:
-    verbosity: detailed
+  otlp:
+    endpoint: "http://service:4319"
+    tls:
+      insecure: true
 
 service:
-  pipelines:
-    traces:
-      receivers: [otlp]
-      exporters: [debug]
+    pipelines:
+      traces:
+        receivers: [otlp]
+        exporters: [otlp]
+      metrics:  # Telegraf  sends metric via OTEL agent
+        receivers: [otlp]
+        exporters: [otlp]
+      logs: # OTEL agents sends logs
+        receivers: [otlp]
+        exporters: [otlp]
