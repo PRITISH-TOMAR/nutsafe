@@ -210,17 +210,3 @@ Single ingest write. No dual pipelines.
 - Baselines + config + scheduler state → SQLite (file inside our service container, row-level updates)
 
 ---
-
-## Roadmap status
-
-| Phase | Description | Status |
-|---|---|---|
-| 0 | Telemetry pipe — collector receives + prints spans | Done |
-| 1 | Ingest → detect → report, synchronous | Done |
-| 2 | Scheduler-based detection | Done |
-| 3 | Algorithm evaluation — selected EWMA | Done |
-| 4 | EWMA latency detection | Done |
-| 5 | Additional alert channels (PagerDuty, Email, SNS) | Next |
-| 6 | Edge TLS + Caddy | Planned |
-| 7 | Migrate to bundle-wise src/ structure | Planned |
-| 8 | Storage layer decision + unified telemetry store | Planned |
