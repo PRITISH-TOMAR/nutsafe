@@ -14,4 +14,11 @@ MIGRATIONS: list[tuple[str, str]] = [
         );
         """,
     ),
+    (
+        "002_seed_default_tenant",
+        """
+        INSERT OR IGNORE INTO tenants (name, api_key)
+        VALUES ('default', 'dev-key-change-me');
+        """,
+    ),
 ]
