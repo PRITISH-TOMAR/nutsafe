@@ -10,7 +10,7 @@ from contextlib import contextmanager
 
 import clickhouse_connect
 
-from core.config import settings
+from coreBundle.config import settings
 
 # ── SQLite ─────────────────────────────────────────────────────────────────────
 
