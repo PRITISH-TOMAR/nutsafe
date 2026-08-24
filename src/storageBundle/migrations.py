@@ -1,0 +1,17 @@
+# Ordered list of migrations. Each entry: (version_id, sql).
+# Append new entries at the bottom. Never edit or remove existing entries.
+
+MIGRATIONS: list[tuple[str, str]] = [
+    (
+        "001_create_tenants",
+        """
+        CREATE TABLE IF NOT EXISTS tenants (
+            tenant_id  INTEGER PRIMARY KEY AUTOINCREMENT,
+            name       TEXT    NOT NULL,
+            api_key    TEXT    NOT NULL UNIQUE,
+            active     INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT    NOT NULL DEFAULT (datetime('now'))
+        );
+        """,
+    ),
+]
