@@ -5,6 +5,8 @@ services:
       dockerfile: ../tools/docker/Dockerfile.collector
     networks:
       - internal
+    ports:
+      - "4318:4318"   # local testing only — remove in prod
     restart: unless-stopped
 
   service:
@@ -44,6 +46,7 @@ services:
 networks:
   internal:
     driver: bridge
+    name: nutsafe_internal
 
 volumes:
   chdata:

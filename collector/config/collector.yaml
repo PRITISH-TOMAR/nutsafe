@@ -7,19 +7,21 @@ receivers:
         endpoint: 0.0.0.0:4318
 
 exporters:
-  otlp:
+  otlphttp:
     endpoint: "http://service:4319"
     tls:
       insecure: true
+  debug:
+    verbosity: detailed   # remove this exporter once storage is wired
 
 service:
     pipelines:
       traces:
         receivers: [otlp]
-        exporters: [otlp]
-      metrics:  # Telegraf  sends metric via OTEL agent
+        exporters: [otlphttp, debug]
+      metrics:  # Telegraf sends metrics via OTLP
         receivers: [otlp]
-        exporters: [otlp]
-      logs: # OTEL agents sends logs
+        exporters: [otlphttp, debug]
+      logs: # OTel agents send logs
         receivers: [otlp]
-        exporters: [otlp]
+        exporters: [otlphttp, debug]
