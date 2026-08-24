@@ -1,38 +1,44 @@
 services:
   collector:
     build:
-      context: ../collector
+      context: ../../collector
+      dockerfile: ../tools/docker/Dockerfile.collector
     networks:
       - internal
-    ports:
-      - "4317:4317"
-      - "4318:4318"
     restart: unless-stopped
 
-  intelligence:
+  service:
     build:
-      context: ../intelligence
+      context: ../..
+      dockerfile: src/Dockerfile
     networks:
       - internal
-    ports:
-      - "4319:4319"
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@storage:5432/${POSTGRES_DB}
+      - CLICKHOUSE_URL=http://clickhouse:8123
     depends_on:
-      - storage
+      - clickhouse
     restart: unless-stopped
 
-  storage:
-    image: postgres:16
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.5
     networks:
       - internal
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
-      - ../storage:/docker-entrypoint-initdb.d
-      - pgdata:/var/lib/postgresql/data
+      - chdata:/var/lib/clickhouse
+    restart: unless-stopped
+
+
+  edge:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - internal
+    volumes:
+      - ../../edge/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
     restart: unless-stopped
 
 networks:
@@ -40,4 +46,6 @@ networks:
     driver: bridge
 
 volumes:
-  pgdata:
+  chdata:
+  caddy_data:
+  caddy_config:
