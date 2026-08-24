@@ -1,6 +1,7 @@
 import uvicorn
 
+from coreBundle.config import settings
 from ingestBundle.receiver import app
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=4319)
+    uvicorn.run(app, host=settings.server.host, port=settings.server.port)
