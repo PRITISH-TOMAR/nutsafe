@@ -3,3 +3,4 @@ uvicorn[standard]
 pydantic
 pyyaml
 clickhouse-connect
+opentelemetry-proto
