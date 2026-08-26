@@ -1,4 +1,15 @@
 from dataclasses import dataclass, field
+from enum import Enum
+
+
+class SpanStatus(str, Enum):
+    UNSET = "UNSET"
+    OK    = "OK"
+    ERROR = "ERROR"
+
+    @classmethod
+    def from_otlp(cls, code: int) -> "SpanStatus":
+        return {0: cls.UNSET, 1: cls.OK, 2: cls.ERROR}.get(code, cls.UNSET)
 
 
 @dataclass
@@ -11,7 +22,7 @@ class SpanRecord:
     target: str | None
     start_time_ns: int
     end_time_ns: int
-    status_code: str        # OK | ERROR | UNSET
+    status_code: SpanStatus
     http_status: int | None
 
 
