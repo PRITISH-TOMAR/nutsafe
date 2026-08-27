@@ -1,7 +1,8 @@
 import logging
 
-from coreBundle.db import get_sqlite
+from coreBundle.database import get_sqlite, get_clickhouse
 from storageBundle.migrations import MIGRATIONS
+from storageBundle.clickhouse_migrations import CH_TABLES
 
 logger = logging.getLogger(__name__)
 
@@ -12,22 +13,34 @@ def run() -> None:
     Tracks applied versions in the schema_migrations table.
     Safe to call on every startup — already-applied migrations are skipped.
     """
-    conn = get_sqlite()
-    conn.execute("""
+    connection = get_sqlite()
+    connection.execute("""
         CREATE TABLE IF NOT EXISTS schema_migrations (
             version    TEXT NOT NULL PRIMARY KEY,
             applied_at TEXT NOT NULL DEFAULT (datetime('now'))
         )
     """)
-    conn.commit()
+    connection.commit()
 
-    applied = {row[0] for row in conn.execute("SELECT version FROM schema_migrations")}
+    applied = {migration[0] for migration in connection.execute("SELECT version FROM schema_migrations")}
 
     for version, sql in MIGRATIONS:
         if version in applied:
             continue
         logger.info("Applying migration: %s", version)
-        conn.executescript(sql)
-        conn.execute("INSERT INTO schema_migrations (version) VALUES (?)", (version,))
-        conn.commit()
+        connection.executescript(sql)
+        connection.execute("INSERT INTO schema_migrations (version) VALUES (?)", (version,))
+        connection.commit()
         logger.info("Migration applied: %s", version)
+
+
+def run_clickhouse() -> None:
+    """
+    Ensure all ClickHouse tables exist.
+    Safe to call on every startup — CREATE TABLE IF NOT EXISTS is idempotent.
+    """
+    clickhouse_client = get_clickhouse()
+    for table_name, ddl in CH_TABLES:
+        logger.info("Ensuring ClickHouse table: %s", table_name)
+        clickhouse_client.command(ddl.strip())
+        logger.info("ClickHouse table ready: %s", table_name)
