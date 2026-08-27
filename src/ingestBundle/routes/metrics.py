@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request, Response
 
 from ingestBundle.deps import require_tenant
 from ingestBundle.parser import parse_metrics
+from storageBundle import metrics
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -16,5 +17,6 @@ async def receive_metrics(request: Request) -> Response:
         return Response(status_code=401)
     body = await request.body()
     points = parse_metrics(body, request.headers.get("content-type", ""))
+    metrics.insert_metrics(tenant_id, points)
     logger.info("METRICS  tenant=%d  points=%d", tenant_id, len(points))
     return Response(status_code=200)
