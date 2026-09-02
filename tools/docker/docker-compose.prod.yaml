@@ -16,7 +16,9 @@ services:
     networks:
       - internal
     environment:
-      - CLICKHOUSE_URL=http://clickhouse:8123
+      - CLICKHOUSE_HOST=clickhouse
+    volumes:
+      - sqlite_data:/data
     depends_on:
       - clickhouse
     restart: unless-stopped
@@ -52,3 +54,4 @@ volumes:
   chdata:
   caddy_data:
   caddy_config:
+  sqlite_data:
