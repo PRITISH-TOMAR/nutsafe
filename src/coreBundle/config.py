@@ -16,7 +16,7 @@ class LoggingConfig(BaseModel):
 
 class ClickHouseConfig(BaseModel):
     host: str = "clickhouse"
-    port: int = 9000
+    port: int = 8123
     database: str = "nutsafe"
     user: str = "default"
     password: str = ""

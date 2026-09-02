@@ -1,5 +1,6 @@
 import logging
 
+from coreBundle.config import settings
 from coreBundle.database import get_sqlite, get_clickhouse
 from storageBundle.migrations import MIGRATIONS
 from storageBundle.clickhouse_migrations import CH_TABLES
@@ -36,10 +37,14 @@ def run() -> None:
 
 def run_clickhouse() -> None:
     """
-    Ensure all ClickHouse tables exist.
-    Safe to call on every startup — CREATE TABLE IF NOT EXISTS is idempotent.
+    Ensure the ClickHouse database and all tables exist.
+    Safe to call on every startup — all statements are idempotent.
     """
     clickhouse_client = get_clickhouse()
+    db = settings.clickhouse.database
+    logger.info("Ensuring ClickHouse database: %s", db)
+    clickhouse_client.command(f"CREATE DATABASE IF NOT EXISTS {db}")
+    logger.info("ClickHouse database ready: %s", db)
     for table_name, ddl in CH_TABLES:
         logger.info("Ensuring ClickHouse table: %s", table_name)
         clickhouse_client.command(ddl.strip())
