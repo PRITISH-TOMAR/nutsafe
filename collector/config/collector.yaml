@@ -11,6 +11,9 @@ exporters:
     endpoint: "http://service:4319"
     tls:
       insecure: true
+    compression: none
+    headers:
+      api-key: "dev-key-change-me"
   debug:
     verbosity: detailed   # remove this exporter once storage is wired
 
