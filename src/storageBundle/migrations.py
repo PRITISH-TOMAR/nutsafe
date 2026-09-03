@@ -21,4 +21,18 @@ MIGRATIONS: list[tuple[str, str]] = [
         VALUES ('default', 'dev-key-change-me');
         """,
     ),
+    (
+        "003_create_baselines",
+        """
+        CREATE TABLE IF NOT EXISTS baselines (
+            tenant_id   INTEGER NOT NULL,
+            span_name   TEXT    NOT NULL,
+            target      TEXT    NOT NULL DEFAULT '',
+            ewma_ns     REAL    NOT NULL,
+            ewma_var_ns REAL    NOT NULL DEFAULT 0,
+            updated_at  TEXT    NOT NULL DEFAULT (datetime('now')),
+            PRIMARY KEY (tenant_id, span_name, target)
+        );
+        """,
+    ),
 ]

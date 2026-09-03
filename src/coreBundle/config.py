@@ -26,6 +26,12 @@ class SQLiteConfig(BaseModel):
     path: str = "/data/nutsafe.db"
 
 
+class DetectionConfig(BaseModel):
+    interval_seconds: int = 60
+    window_minutes: int = 5
+    min_spans: int = 5
+
+
 class AlertsConfig(BaseModel):
     webhook_url: str = ""
     slack_url: str = ""
@@ -43,6 +49,7 @@ class Settings(BaseModel):
     logging: LoggingConfig = LoggingConfig()
     clickhouse: ClickHouseConfig = ClickHouseConfig()
     sqlite: SQLiteConfig = SQLiteConfig()
+    detection: DetectionConfig = DetectionConfig()
     alerts: AlertsConfig = AlertsConfig()
 
 
