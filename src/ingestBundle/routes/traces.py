@@ -5,6 +5,8 @@ from fastapi import APIRouter, Request, Response
 from ingestBundle.deps import require_tenant
 from ingestBundle.parser import parse_traces
 from storageBundle import spans
+from detectionBundle import baseline
+from coreBundle.database import sqlite_tx
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -18,5 +20,9 @@ async def receive_traces(request: Request) -> Response:
     body = await request.body()
     records = parse_traces(body, request.headers.get("content-type", ""))
     spans.insert_spans(tenant_id, records)
+    with sqlite_tx() as conn:
+        for record in records:
+            duration_ns = record.end_time_ns - record.start_time_ns
+            baseline.update(conn, tenant_id, record.span_name, record.target, duration_ns)
     logger.info("TRACES  tenant=%d  spans=%d", tenant_id, len(records))
     return Response(status_code=200)
